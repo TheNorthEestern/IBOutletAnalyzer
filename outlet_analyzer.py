@@ -12,8 +12,9 @@ class Analyzer:
         self.lines = []
         self.functions = []
         self.function_template = """
+        // $class_name
         -(void)setAccessibilityIdentifiers {
-            $variable_set
+        $variable_set
         }
         """
         output = Analyzer.call_grep(file_path)
@@ -33,12 +34,12 @@ class Analyzer:
         for class_name, variables_array in self.outlets.items():
             function_body = ""
             for index, variable in enumerate(variables_array):
-                tabs = "\t" if index != 0 else ""
-                function_body += '%sself.%s.accessibilityIdentifier = @"%s";\n' % (tabs, variable, variable)
-            self.functions.append(Template(self.function_template).substitute(dict(variable_set=function_body)))
+                function_body += '\tself.%s.accessibilityIdentifier = @"%s";\n\t' % (variable, variable)
+            self.functions.append(Template(self.function_template).substitute(dict(variable_set=function_body, class_name=class_name)))
 
-        for function in self.functions:
+        for index, function in enumerate(self.functions):
             print(function)
+            print('<-------------------->', index)
             print()
 
     @staticmethod
